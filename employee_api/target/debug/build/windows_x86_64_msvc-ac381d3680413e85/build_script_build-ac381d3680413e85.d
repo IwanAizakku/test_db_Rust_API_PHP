@@ -1,5 +1,5 @@
-C:\xampp\htdocs\test_db\employee_api\target\debug\build\windows_x86_64_msvc-ac381d3680413e85\build_script_build-ac381d3680413e85.exe: C:\Users\Ivan\ Isaac\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\build.rs
+C:\xampp\htdocs\test_db_Rust\employee_api\target\debug\build\windows_x86_64_msvc-ac381d3680413e85\build_script_build-ac381d3680413e85.exe: C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\build.rs
 
-C:\xampp\htdocs\test_db\employee_api\target\debug\build\windows_x86_64_msvc-ac381d3680413e85\build_script_build-ac381d3680413e85.d: C:\Users\Ivan\ Isaac\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\build.rs
+C:\xampp\htdocs\test_db_Rust\employee_api\target\debug\build\windows_x86_64_msvc-ac381d3680413e85\build_script_build-ac381d3680413e85.d: C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\build.rs
 
-C:\Users\Ivan\ Isaac\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\build.rs:
+C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\build.rs:
