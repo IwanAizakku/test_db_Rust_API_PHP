@@ -15,10 +15,10 @@ use crate::{
 
 pub fn create_router(app_state: Arc<AppState>) -> Router {
     Router::new()
-        .route("/api/employees/", post(create_employee_handler))
-        .route("/api/employees", get(employee_list_handler))
+        .route("/employees", post(create_employee_handler))
+        .route("/employees", get(employee_list_handler))
         .route(
-            "/api/employees/:id",
+            "/employees/:id",
             get(get_employee_handler)
                 .patch(edit_employee_handler)
                 .delete(delete_employee_handler),

@@ -52,13 +52,13 @@ pub async fn employee_list_handler(
         (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
     })?;
 
-    // Convert the EmployeeModel to EmployeeModelResponse
+    // Convert EmployeeModel to EmployeeModelResponse
     let employee_responses = employees
         .iter()
         .map(|employee| filter_db_record(&employee))
         .collect::<Vec<EmployeeModelResponse>>();
 
-    // Create the JSON response with the list of employees
+    // Create JSON response with the list of employees
     let json_response = serde_json::json!({
         "status": "success",
         "results": employee_responses.len(),
@@ -68,7 +68,7 @@ pub async fn employee_list_handler(
     Ok(Json(json_response))
 }
 
-// Create function
+// Create
 pub async fn create_employee_handler(
     State(data): State<Arc<AppState>>,
     Json(body): Json<CreateEmployeeSchema>,
@@ -133,7 +133,7 @@ pub async fn create_employee_handler(
     Ok(Json(employee_response))
 }
 
-// Get function
+// Get
 pub async fn get_employee_handler(
     Path(emp_no): Path<String>,  // emp_no is a string (could be UUID or integer depending on your design)
     State(data): State<Arc<AppState>>,
@@ -176,7 +176,7 @@ pub async fn get_employee_handler(
     }
 }
 
-// Edit function
+// Edit
 pub async fn edit_employee_handler(
     Path(emp_no): Path<String>,  // emp_no is a string (could be UUID or integer depending on your design)
     State(data): State<Arc<AppState>>,
@@ -260,7 +260,7 @@ pub async fn edit_employee_handler(
     Ok(Json(employee_response))
 }
 
-// Delete function
+// Delete
 pub async fn delete_employee_handler(
     Path(emp_no): Path<String>,  // emp_no as a string (could be UUID or integer depending on your design)
     State(data): State<Arc<AppState>>,
