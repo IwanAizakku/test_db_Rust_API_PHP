@@ -1,8 +1,0 @@
-C:\xampp\htdocs\test_db_Rust\employee_api\target\debug\deps\libwindows_link-26fb13a9541650fa.rmeta: C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\lib.rs C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\../readme.md
-
-C:\xampp\htdocs\test_db_Rust\employee_api\target\debug\deps\libwindows_link-26fb13a9541650fa.rlib: C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\lib.rs C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\../readme.md
-
-C:\xampp\htdocs\test_db_Rust\employee_api\target\debug\deps\windows_link-26fb13a9541650fa.d: C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\lib.rs C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\../readme.md
-
-C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\lib.rs:
-C:\Users\ivani\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows-link-0.1.0\src\../readme.md:
