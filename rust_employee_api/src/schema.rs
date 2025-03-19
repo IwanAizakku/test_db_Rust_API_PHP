@@ -1,12 +1,6 @@
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDate;
 
-#[derive(Deserialize, Debug, Default)]
-pub struct FilterOptions {
-    pub page: Option<usize>,
-    pub limit: Option<usize>,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateEmployeeSchema {
     pub first_name: String,
