@@ -1,43 +1,37 @@
-mod handler;
-mod model;
-mod route;
-mod schema;
+// src/main.rs
+mod db;
+mod employees;
+mod departments;
+mod dept_manager;
+mod dept_emp;
+mod titles;
+mod salaries;
 
 use std::sync::Arc;
-
-use axum::http::{
-    header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
-    HeaderValue, Method,
+use axum::{
+    Router,
+    http::{
+        header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+        HeaderValue, Method,
+    },
 };
 use dotenv::dotenv;
-use route::create_router;
 use tower_http::cors::CorsLayer;
 
-use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
-
-pub struct AppState {
-    db: MySqlPool,
-}
+use crate::db::AppState;
+use crate::employees::routes as employee_routes;
+use crate::departments::routes as department_routes;
+use crate::dept_manager::routes as dept_manager_routes;
+use crate::dept_emp::routes as dept_emp_routes;
+use crate::titles::routes as titles_routes;
+use crate::salaries::routes as salaries_routes;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = match MySqlPoolOptions::new()
-        .max_connections(10)
-        .connect(&database_url)
-        .await
-    {
-        Ok(pool) => {
-            println!("✅Connection to the database is successful!");
-            pool
-        }
-        Err(err) => {
-            println!("🔥 Failed to connect to the database: {:?}", err);
-            std::process::exit(1);
-        }
-    };
+    let pool = db::create_pool().await;
+    let app_state = Arc::new(AppState { db: pool.clone() });
 
     let cors = CorsLayer::new()
         .allow_origin("http://localhost:8000".parse::<HeaderValue>().unwrap())
@@ -45,9 +39,24 @@ async fn main() {
         .allow_credentials(true)
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
 
-    let app = create_router(Arc::new(AppState { db: pool.clone() })).layer(cors);
+    let employee_routes = employee_routes::create_employee_routes(app_state.clone());
+    let department_routes = department_routes::create_department_routes(app_state.clone());
+    let dept_manager_routes = dept_manager_routes::create_dept_manager_routes(app_state.clone());
+    let dept_emp_routes = dept_emp_routes::create_dept_emp_routes(app_state.clone());
+    let titles_routes = titles_routes::create_titles_routes(app_state.clone());
+    let salaries_routes = salaries_routes::create_salaries_routes(app_state.clone());
 
-    println!("🚀 Server started successfully");
+    let app = Router::new()
+        .nest_service("/employees", employee_routes)
+        .nest_service("/departments", department_routes)
+        .nest_service("/dept_manager", dept_manager_routes)
+        .nest_service("/dept_emp", dept_emp_routes)
+        .nest_service("/titles", titles_routes)
+        .nest_service("/salaries", salaries_routes)
+        .layer(cors)
+        .with_state(app_state);
+
+    println!("🚀 Server started successfully!");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
