@@ -1,17 +1,19 @@
 // Employees functions
 use axum::{extract::{Path, State}, http::StatusCode, Json};
 use std::sync::Arc;
-
 use crate::db::AppState;
 use crate::employees::models::Employee;
+use crate::auth::Claims; // Add this line
 
 // Create Employee
 pub async fn create_employee_handler(
+    claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Json(new_employee): Json<Employee>,
 ) -> Result<Json<Employee>, StatusCode> {
+    // You can use claims.sub to identify the user making the request.
     let query = "INSERT INTO employees (emp_no, birth_date, first_name, last_name, gender, hire_date) 
-                    VALUES (?, ?, ?, ?, ?, ?)";
+                         VALUES (?, ?, ?, ?, ?, ?)";
     
     let result = sqlx::query(query)
         .bind(new_employee.emp_no)
@@ -34,8 +36,10 @@ pub async fn create_employee_handler(
 
 // Get All Employees
 pub async fn employee_list_handler(
+    claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<Vec<Employee>>, StatusCode> {
+    // You can use claims.sub to identify the user making the request.
     let query = "SELECT * FROM employees";
 
     let employees = sqlx::query_as::<_, Employee>(query)
@@ -53,9 +57,11 @@ pub async fn employee_list_handler(
 
 // Get Employee by ID
 pub async fn get_employee_handler(
+    claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
 ) -> Result<Json<Employee>, StatusCode> {
+    // You can use claims.sub to identify the user making the request.
     let query = "SELECT * FROM employees WHERE emp_no = ?";
     let employee = sqlx::query_as::<_, Employee>(query)
         .bind(emp_no)
@@ -70,13 +76,15 @@ pub async fn get_employee_handler(
 
 // Update Employee
 pub async fn edit_employee_handler(
+    claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
     Json(updated_employee): Json<Employee>,
 ) -> Result<Json<Employee>, StatusCode> {
+    // You can use claims.sub to identify the user making the request.
     let query = "UPDATE employees 
-                    SET birth_date = ?, first_name = ?, last_name = ?, gender = ?, hire_date = ? 
-                    WHERE emp_no = ?";
+                         SET birth_date = ?, first_name = ?, last_name = ?, gender = ?, hire_date = ? 
+                         WHERE emp_no = ?";
 
     let result = sqlx::query(query)
         .bind(&updated_employee.birth_date)
@@ -96,9 +104,11 @@ pub async fn edit_employee_handler(
 
 // Delete Employee
 pub async fn delete_employee_handler(
+    claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
 ) -> StatusCode {
+    // You can use claims.sub to identify the user making the request.
     let query = "DELETE FROM employees WHERE emp_no = ?";
 
     let result = sqlx::query(query)

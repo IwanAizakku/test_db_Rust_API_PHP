@@ -1,4 +1,3 @@
-// src/main.rs
 mod db;
 mod employees;
 mod departments;
@@ -6,18 +5,21 @@ mod dept_manager;
 mod dept_emp;
 mod titles;
 mod salaries;
+mod auth; // Add this line
 
 use std::sync::Arc;
 use axum::{
-    Router,
+    extract::{FromRequestParts, State},
     http::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
-        HeaderValue, Method,
+        HeaderValue, Method, StatusCode, Request,
     },
+    http::request::Parts, // Corrected import
+    Router,
 };
 use dotenv::dotenv;
 use tower_http::cors::CorsLayer;
-
+use crate::auth::{Claims, validate_jwt}; //Add this line
 use crate::db::AppState;
 use crate::employees::routes as employee_routes;
 use crate::departments::routes as department_routes;
@@ -25,6 +27,34 @@ use crate::dept_manager::routes as dept_manager_routes;
 use crate::dept_emp::routes as dept_emp_routes;
 use crate::titles::routes as titles_routes;
 use crate::salaries::routes as salaries_routes;
+
+#[async_trait::async_trait]
+impl<S: Send + Sync> FromRequestParts<S> for Claims {
+    type Rejection = StatusCode;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let auth_header = parts.headers.get(AUTHORIZATION);
+
+        match auth_header {
+            Some(header) => {
+                if let Ok(header_str) = header.to_str() {
+                    if header_str.starts_with("Bearer ") {
+                        let token = header_str.trim_start_matches("Bearer ");
+                        match validate_jwt(token) {
+                            Ok(claims) => Ok(claims),
+                            Err(_) => Err(StatusCode::UNAUTHORIZED),
+                        }
+                    } else {
+                        Err(StatusCode::UNAUTHORIZED)
+                    }
+                } else {
+                    Err(StatusCode::UNAUTHORIZED)
+                }
+            }
+            None => Err(StatusCode::UNAUTHORIZED),
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() {
