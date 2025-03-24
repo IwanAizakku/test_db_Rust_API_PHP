@@ -1,4 +1,12 @@
-# Integrating RUST for RESTful API - test_db 
+# Rust RESTful API
+
+Fork test_db for database reference to build API with CRUD functions with Rust and Axum as web application framework
+
+Functions:
+CRUD function to database usign CRUL (partial)
+JWT token authentication (done)
+user request limit (done)
+encryption and decryption from PHP layer (In progress)
 
 
 *OP
