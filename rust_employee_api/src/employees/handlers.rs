@@ -3,11 +3,11 @@ use axum::{extract::{Path, State}, http::StatusCode, Json};
 use std::sync::Arc;
 use crate::db::AppState;
 use crate::employees::models::Employee;
-use crate::auth::Claims; // Add this line
+use crate::auth::Claims;
 
 // Create Employee
 pub async fn create_employee_handler(
-    claims: Claims, // Add this line
+    _claims: Claims, 
     State(state): State<Arc<AppState>>,
     Json(new_employee): Json<Employee>,
 ) -> Result<Json<Employee>, StatusCode> {
@@ -36,7 +36,7 @@ pub async fn create_employee_handler(
 
 // Get All Employees
 pub async fn employee_list_handler(
-    claims: Claims, // Add this line
+    _claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<Vec<Employee>>, StatusCode> {
     // You can use claims.sub to identify the user making the request.
@@ -57,7 +57,7 @@ pub async fn employee_list_handler(
 
 // Get Employee by ID
 pub async fn get_employee_handler(
-    claims: Claims, // Add this line
+    _claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
 ) -> Result<Json<Employee>, StatusCode> {
@@ -76,7 +76,7 @@ pub async fn get_employee_handler(
 
 // Update Employee
 pub async fn edit_employee_handler(
-    claims: Claims, // Add this line
+    _claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
     Json(updated_employee): Json<Employee>,
@@ -104,7 +104,7 @@ pub async fn edit_employee_handler(
 
 // Delete Employee
 pub async fn delete_employee_handler(
-    claims: Claims, // Add this line
+    _claims: Claims, // Add this line
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
 ) -> StatusCode {

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey, errors::Error};
-use chrono::{Utc, Duration};
+use jsonwebtoken::{decode, Validation, DecodingKey, errors::Error, errors::ErrorKind};
+use std::env; // Import the env module
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
@@ -8,27 +8,23 @@ pub struct Claims {
     pub exp: usize, // Expiration time (Unix timestamp)
 }
 
-const SECRET: &[u8] = b"your_secret_key"; // Replace with your actual secret
-
-pub fn create_jwt(user_id: String) -> Result<String, Error> {
-    let expiration = Utc::now()
-        .checked_add_signed(Duration::minutes(60)) // Token expires in 1 hour
-        .expect("valid timestamp")
-        .timestamp() as usize;
-
-    let claims = Claims {
-        sub: user_id,
-        exp: expiration,
-    };
-
-    let header = Header::default();
-    encode(&header, &claims, &EncodingKey::from_secret(SECRET))
+fn get_secret_key() -> Vec<u8> {
+    env::var("JWT_SECRET").expect("JWT_SECRET must be set").into_bytes()
 }
 
 pub fn validate_jwt(token: &str) -> Result<Claims, Error> {
-    decode::<Claims>(
+    let validation = Validation::default();
+    match decode::<Claims>(
         token,
-        &DecodingKey::from_secret(SECRET),
-        &Validation::default(),
-    ).map(|c| c.claims)
+        &DecodingKey::from_secret(&get_secret_key()),
+        &validation,
+    ) {
+        Ok(c) => Ok(c.claims),
+        Err(e) => {
+            match e.kind() {
+                ErrorKind::ExpiredSignature => Err(Error::from(ErrorKind::ExpiredSignature)),
+                _ => Err(e),
+            }
+        }
+    }
 }
