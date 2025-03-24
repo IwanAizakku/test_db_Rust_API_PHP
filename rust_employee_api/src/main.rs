@@ -5,7 +5,8 @@ mod dept_manager;
 mod dept_emp;
 mod titles;
 mod salaries;
-mod auth; 
+mod auth;
+mod rate_limit;
 
 use std::sync::Arc;
 use axum::{
@@ -14,17 +15,16 @@ use axum::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
         HeaderValue, Method, StatusCode,
     },
-    http::request::Parts, 
-    Router,
-    Json, // Add Json for returning error messages
+    http::request::Parts,
+    Router, Json,
 };
 use futures::future::ready;
 use dotenv::dotenv;
 use tower_http::cors::CorsLayer;
-use crate::auth::{Claims, validate_jwt}; 
+use crate::auth::{Claims, validate_jwt};
 use crate::db::AppState;
-use serde_json::{json, Value}; // Add Value for returning json errors.
-use std::future::Future; // Add future trait.
+use serde_json::{json, Value};
+use std::future::Future;
 
 use crate::employees::routes as employee_routes;
 use crate::departments::routes as department_routes;
@@ -91,7 +91,8 @@ async fn main() {
         .nest_service("/titles", titles_routes)
         .nest_service("/salaries", salaries_routes)
         .layer(cors)
-        .with_state(app_state);
+        .with_state(app_state.clone()) // Use app_state.clone() here
+        .layer(axum::middleware::from_fn_with_state(app_state.clone(), crate::rate_limit::rate_limit_middleware)); // Apply the middleware here.
 
     println!("🚀 Server started successfully!");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();

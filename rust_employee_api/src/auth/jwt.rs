@@ -4,7 +4,7 @@ use std::env; // Import the env module
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
-    pub sub: String, // User ID or username
+    pub sub: String, // Username
     pub exp: usize, // Expiration time (Unix timestamp)
 }
 
