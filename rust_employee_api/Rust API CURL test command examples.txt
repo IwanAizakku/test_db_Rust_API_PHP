@@ -1,0 +1,18 @@
+// Example curl commands for department table
+//Using curl on Windows cmd
+
+// Department
+GET departments
+curl "http://localhost:8000/departments" -H "Authorization: Bearer (YOUR_JWT_TOKEN)"
+
+GET department d009:
+curl -X GET "http://localhost:8000/departments/d009" -H "Authorization: Bearer (YOUR_JWT_TOKEN)"
+
+POST new department
+curl -X POST "http://localhost:8000/departments" -H "Content-Type: application/json" -H "Authorization: Bearer (YOUR_JWT_TOKEN)" -d "{\"dept_no\":\"d010\",\"dept_name\":\"Software Engineering\"}"
+
+PATCH department d010
+curl -X PATCH "http://localhost:8000/departments/d010" -H "Content-Type: application/json" -H "Authorization: Bearer (YOUR_JWT_TOKEN)" -d "{\"dept_no\":\"d010\",\"dept_name\":\"Software Research\"}"
+
+DELETE department d010
+curl -X DELETE "http://localhost:8000/departments/d010" -H "Authorization: Bearer (YOUR_JWT_TOKEN)"
