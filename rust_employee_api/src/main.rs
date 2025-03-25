@@ -7,10 +7,11 @@ mod titles;
 mod salaries;
 mod auth;
 mod rate_limit;
+mod sodium;
 
 use std::sync::Arc;
 use axum::{
-    extract::FromRequestParts,
+    extract::{FromRequestParts, Query},
     http::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
         HeaderValue, Method, StatusCode,
@@ -63,9 +64,23 @@ where
     }
 }
 
+async fn decrypt_handler(Query(params): Query<std::collections::HashMap<String, String>>) -> Result<Json<Value>, StatusCode> {
+    let mut encrypted_data = params.get("data").ok_or(StatusCode::BAD_REQUEST)?.clone(); // Clone the string so we can modify it.
+    encrypted_data = encrypted_data.replace(" ", "+"); // Replace spaces with '+'
+    println!("Modified Encrypted Data: {}", encrypted_data); // print the modified string.
+    match crate::sodium::sodium_crypto::decrypt_string(&encrypted_data) {
+        Ok(value) => Ok(Json(value)),
+        Err(e) => {
+            eprintln!("Decryption error: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
+    sodiumoxide::init().expect("sodiumoxide::init failed"); // Initialize Sodium
 
     let pool = db::create_pool().await;
     let app_state = Arc::new(AppState { db: pool.clone() });
@@ -80,8 +95,8 @@ async fn main() {
     let department_routes = department_routes::create_department_routes(app_state.clone());
     let dept_manager_routes = dept_manager_routes::create_dept_manager_routes(app_state.clone());
     let dept_emp_routes = dept_emp_routes::create_dept_emp_routes(app_state.clone());
-    let titles_routes = titles_routes::create_titles_routes(app_state.clone());
-    let salaries_routes = salaries_routes::create_salaries_routes(app_state.clone());
+    let titles_routes = titles_routes::create_title_routes(app_state.clone());
+    let salaries_routes = salaries_routes::create_salary_routes(app_state.clone());
 
     let app = Router::new()
         .nest_service("/employees", employee_routes)
@@ -90,9 +105,10 @@ async fn main() {
         .nest_service("/dept_emp", dept_emp_routes)
         .nest_service("/titles", titles_routes)
         .nest_service("/salaries", salaries_routes)
+        .route("/decrypt", axum::routing::get(decrypt_handler)) // Add the new route
         .layer(cors)
-        .with_state(app_state.clone()) // Use app_state.clone() here
-        .layer(axum::middleware::from_fn_with_state(app_state.clone(), crate::rate_limit::rate_limit_middleware)); // Apply the middleware here.
+        .with_state(app_state.clone())
+        .layer(axum::middleware::from_fn_with_state(app_state.clone(), crate::rate_limit::rate_limit::rate_limit_middleware));
 
     println!("🚀 Server started successfully!");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();

@@ -82,8 +82,7 @@ CREATE TABLE titles (
     to_date     DATE,
     FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
     PRIMARY KEY (emp_no,title, from_date)
-) 
-; 
+); 
 
 CREATE TABLE salaries (
     emp_no      INT             NOT NULL,
@@ -92,15 +91,13 @@ CREATE TABLE salaries (
     to_date     DATE            NOT NULL,
     FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
     PRIMARY KEY (emp_no, from_date)
-) 
-; 
+); 
 
 CREATE TABLE rate_limits (
     username             VARCHAR(256)    NOT NULL,
     remaining_requests   INT             NOT NULL,
     PRIMARY KEY (username)
-) 
-; 
+); 
 
 CREATE OR REPLACE VIEW dept_emp_latest_date AS
     SELECT emp_no, MAX(from_date) AS from_date, MAX(to_date) AS to_date
