@@ -5,16 +5,15 @@ use std::sync::Arc;
 use crate::db::AppState;
 use crate::employees::models::Employee;
 use crate::auth::Claims;
-use crate::sodium::sodium_crypto::{encrypt_json, get_key}; // Import get_key
 
 // Create Employee
 pub async fn create_employee_handler(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
     Json(new_employee): Json<Employee>,
-) -> Result<Json<String>, StatusCode> {
+) -> Result<Json<serde_json::Value>, StatusCode> { //Modified return type
     let query = "INSERT INTO employees (emp_no, birth_date, first_name, last_name, gender, hire_date) 
-                                VALUES (?, ?, ?, ?, ?   , ?)";
+                                        VALUES (?, ?, ?, ?, ?, ?)";
 
     let result = sqlx::query(query)
         .bind(new_employee.emp_no)
@@ -29,9 +28,7 @@ pub async fn create_employee_handler(
     match result {
         Ok(_) => {
             let json_data = serde_json::to_value(new_employee).unwrap();
-            let key = get_key(); // Retrieve the key
-            let encrypted_data = encrypt_json(&json_data, &key).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-            Ok(Json(encrypted_data))
+            Ok(Json(json_data)) // Return raw JSON
         }
         Err(e) => {
             eprintln!("Error creating employee: {:?}", e);
@@ -44,7 +41,7 @@ pub async fn create_employee_handler(
 pub async fn employee_list_handler(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
-) -> Result<Json<String>, StatusCode> {
+) -> Result<Json<serde_json::Value>, StatusCode> { //Modified return type
     let query = "SELECT * FROM employees";
 
     let employees = sqlx::query_as::<_, Employee>(query)
@@ -54,9 +51,7 @@ pub async fn employee_list_handler(
     match employees {
         Ok(data) => {
             let json_data = serde_json::to_value(data).unwrap();
-            let key = get_key(); // Retrieve the key
-            let encrypted_data = encrypt_json(&json_data, &key).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-            Ok(Json(encrypted_data))
+            Ok(Json(json_data)) // Return raw JSON
         }
         Err(e) => {
             eprintln!("Error fetching employees: {:?}", e);
@@ -70,7 +65,7 @@ pub async fn get_employee_handler(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
-) -> Result<Json<String>, StatusCode> {
+) -> Result<Json<serde_json::Value>, StatusCode> { //Modified return type
     let query = "SELECT * FROM employees WHERE emp_no = ?";
     let employee = sqlx::query_as::<_, Employee>(query)
         .bind(emp_no)
@@ -80,9 +75,7 @@ pub async fn get_employee_handler(
     match employee {
         Ok(data) => {
             let json_data = serde_json::to_value(data).unwrap();
-            let key = get_key(); // Retrieve the key
-            let encrypted_data = encrypt_json(&json_data, &key).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-            Ok(Json(encrypted_data))
+            Ok(Json(json_data)) // Return raw JSON
         }
         Err(_) => Err(StatusCode::NOT_FOUND),
     }
@@ -94,10 +87,10 @@ pub async fn edit_employee_handler(
     State(state): State<Arc<AppState>>,
     Path(emp_no): Path<i32>,
     Json(updated_employee): Json<Employee>,
-) -> Result<Json<String>, StatusCode> {
+) -> Result<Json<serde_json::Value>, StatusCode> { //Modified return type
     let query = "UPDATE employees 
-                                SET birth_date = ?, first_name = ?, last_name = ?, gender = ?, hire_date = ? 
-                                WHERE emp_no = ?";
+                                        SET birth_date = ?, first_name = ?, last_name = ?, gender = ?, hire_date = ? 
+                                        WHERE emp_no = ?";
 
     let result = sqlx::query(query)
         .bind(&updated_employee.birth_date)
@@ -112,9 +105,7 @@ pub async fn edit_employee_handler(
     match result {
         Ok(_) => {
             let json_data = serde_json::to_value(updated_employee).unwrap();
-            let key = get_key(); // Retrieve the key
-            let encrypted_data = encrypt_json(&json_data, &key).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-            Ok(Json(encrypted_data))
+            Ok(Json(json_data)) // Return raw JSON
         }
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }

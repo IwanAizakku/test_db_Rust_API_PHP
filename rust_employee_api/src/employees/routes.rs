@@ -1,5 +1,5 @@
 use axum::{
-    routing::{get, post,},
+    routing::{get, post},
     Router,
     extract::{Path, State},
     Json,
@@ -8,7 +8,7 @@ use std::sync::Arc;
 use crate::db::AppState;
 use crate::employees::handlers::*;
 use crate::auth::Claims;
-use crate::employees::models::*; 
+use crate::employees::models::*;
 
 pub fn create_employee_routes(app_state: Arc<AppState>) -> Router {
     Router::new()
