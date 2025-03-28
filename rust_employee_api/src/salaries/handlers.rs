@@ -37,7 +37,7 @@ pub async fn salary_list_handler(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<String>, StatusCode> {
-    let query = "SELECT * FROM salaries";
+    let query = "SELECT * FROM salaries LIMIT 10";
     let salaries = sqlx::query_as::<_, Salary>(query)
         .fetch_all(&state.db)
         .await;

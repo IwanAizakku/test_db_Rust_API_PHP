@@ -77,10 +77,17 @@ async fn decrypt_handler(Query(params): Query<std::collections::HashMap<String, 
     }
 }
 
+async fn get_sodium_key() -> String {
+    crate::sodium::sodium_crypto::get_key_base64()
+}
+
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
+    dotenv().ok();  
     sodiumoxide::init().expect("sodiumoxide::init failed"); // Initialize Sodium
+
+    // Force key generation on server startup.
+    crate::sodium::sodium_crypto::initialize_key();
 
     let pool = db::create_pool().await;
     let app_state = Arc::new(AppState { db: pool.clone() });
@@ -106,6 +113,7 @@ async fn main() {
         .nest_service("/titles", titles_routes)
         .nest_service("/salaries", salaries_routes)
         .route("/decrypt", axum::routing::get(decrypt_handler)) // Add the new route
+        .route("/sodium_key", axum::routing::get(get_sodium_key)) // Add this line
         .layer(cors)
         .with_state(app_state.clone())
         .layer(axum::middleware::from_fn_with_state(app_state.clone(), crate::rate_limit::rate_limit::rate_limit_middleware));

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use jsonwebtoken::{decode, Validation, DecodingKey, errors::Error, errors::ErrorKind};
 use std::env; // Import the env module
+use dotenv::dotenv; // Import the dotenv crate
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
@@ -9,6 +10,9 @@ pub struct Claims {
 }
 
 fn get_secret_key() -> Vec<u8> {
+    // Load environment variables from .env file
+    dotenv().ok();
+
     env::var("JWT_SECRET").expect("JWT_SECRET must be set").into_bytes()
 }
 

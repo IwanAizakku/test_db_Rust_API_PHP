@@ -38,7 +38,7 @@ pub async fn title_list_handler(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<String>, StatusCode> {
-    let query = "SELECT * FROM titles";
+    let query = "SELECT * FROM titles LIMIT 10";
     let titles = sqlx::query_as::<_, Title>(query)
         .fetch_all(&state.db)
         .await;

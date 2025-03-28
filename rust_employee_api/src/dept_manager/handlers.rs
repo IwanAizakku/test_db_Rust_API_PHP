@@ -37,7 +37,7 @@ pub async fn dept_manager_list_handler(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<String>, StatusCode> {
-    let query = "SELECT * FROM dept_manager";
+    let query = "SELECT * FROM dept_manager LIMIT 10";
     let dept_managers = sqlx::query_as::<_, DeptManager>(query)
         .fetch_all(&state.db)
         .await;
