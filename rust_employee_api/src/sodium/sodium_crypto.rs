@@ -2,11 +2,19 @@ use sodiumoxide::crypto::secretbox;
 use serde_json::{Value, to_vec, from_slice};
 use sodiumoxide::base64::{encode, decode, Variant};
 use lazy_static::lazy_static;
+use std::env;
 
 lazy_static! {
     static ref ENCRYPTION_KEY: secretbox::Key = {
+        if let Ok(base64_key) = env::var("SODIUM_KEY") {
+            if let Ok(key_bytes) = decode(&base64_key, Variant::Original) {
+                if let Some(key) = secretbox::Key::from_slice(&key_bytes) {
+                    return key;
+                }
+            }
+        }
         let key = secretbox::gen_key();
-        println!("SODIUM_KEY: {}", encode(key.as_ref(), Variant::Original)); // Print the key
+        println!("SODIUM_KEY: {}", encode(key.as_ref(), Variant::Original));
         key
     };
 }
