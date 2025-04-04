@@ -296,6 +296,20 @@ ob_end_flush();
             <?php unset($_SESSION['message'], $_SESSION['alert_type']); ?>
         <?php endif; ?>
     });
+
+    // Confirm before deletion
+    document.addEventListener("DOMContentLoaded", function() {
+        const deleteForms = document.querySelectorAll("form button[name='delete']");
+
+        deleteForms.forEach(button => {
+            button.addEventListener("click", function(event) {
+                const confirmed = confirm("Are you sure you want to delete this employee?");
+                if (!confirmed) {
+                    event.preventDefault(); // Stop form submission
+                }
+            });
+        });
+    });
     </script>
 </body>
 </html>
